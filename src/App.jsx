@@ -33,6 +33,14 @@ const INTRO_POINTS = [
   'Bring clearer questions to your care team',
 ];
 
+const INDUSTRY_STATS = [
+  { label: 'Active research papers indexed', value: '260k+', detail: 'childhood cancer and pediatric oncology topics' },
+  { label: 'Recent yearly activity', value: '21k+', detail: 'new papers across treatment, genetics, and survivorship' },
+  { label: 'Main progress areas', value: '4', detail: 'immune therapy, precision medicine, late effects, supportive care' },
+];
+
+const INDUSTRY_TREND = [42, 56, 51, 68, 74, 86, 92];
+
 function cleanText(value) {
   return value?.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() || '';
 }
@@ -165,6 +173,70 @@ function ResearchAnalytics({ articles, analytics }) {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function IndustrySnapshot() {
+  const maxTrend = Math.max(...INDUSTRY_TREND);
+
+  return (
+    <section className="industry-snapshot scroll-scale my-8 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div>
+          <p className="flex items-center gap-2 text-sm font-semibold text-slate-950 dark:text-white">
+            <BarChart3 className="h-4 w-4" />
+            Research industry snapshot
+          </p>
+          <h3 className="mt-3 max-w-xl text-2xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-3xl">
+            A quick look at the pace of childhood cancer research.
+          </h3>
+          <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+            These high-level signals help parents see that the field is moving, and where the strongest research attention is gathering.
+          </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {INDUSTRY_STATS.map((stat) => (
+            <div key={stat.label} className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+              <p className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">{stat.value}</p>
+              <p className="mt-2 text-sm font-medium text-slate-700 dark:text-slate-200">{stat.label}</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{stat.detail}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Momentum over time</p>
+            <span className="rounded-full border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 dark:border-slate-800 dark:text-slate-400">
+              rising attention
+            </span>
+          </div>
+          <div className="industry-bars mt-5 flex h-28 items-end gap-2">
+            {INDUSTRY_TREND.map((value, index) => (
+              <div key={`${value}-${index}`} className="flex min-w-0 flex-1 items-end">
+                <div
+                  className="industry-bar w-full rounded-t-xl bg-slate-950 dark:bg-white"
+                  style={{
+                    '--bar-height': `${Math.max((value / maxTrend) * 100, 12)}%`,
+                    '--bar-delay': `${index * 90}ms`,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">What this means</p>
+          <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+            More papers do not always mean an immediate treatment change, but they do show where scientists and doctors are learning fastest.
+          </p>
         </div>
       </div>
     </section>
@@ -329,6 +401,8 @@ export default function App() {
                 <ArrowDown className="h-4 w-4" />
               </a>
             </div>
+
+            <IndustrySnapshot />
 
             <div id="research-search" className="scroll-reveal scroll-mt-24 py-8 sm:py-12">
               <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Search the research</p>
