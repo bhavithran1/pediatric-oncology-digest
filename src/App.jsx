@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
+  ArrowDown,
   BarChart3,
   Bookmark,
   Library,
@@ -25,6 +26,12 @@ const DATE_OPTIONS = [
 ];
 
 const QUICK_SEARCHES = ['ALL leukemia', 'medulloblastoma', 'CAR-T', 'late effects'];
+
+const INTRO_POINTS = [
+  'See how active a research field is',
+  'Read papers in parent-friendly language',
+  'Bring clearer questions to your care team',
+];
 
 function cleanText(value) {
   return value?.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() || '';
@@ -295,11 +302,39 @@ export default function App() {
           <SavedArticles allArticles={articles || []} />
         ) : (
           <section className="min-w-0">
-            <div className="py-8 sm:py-12">
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">For parents and caregivers</p>
-              <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-5xl">
-                Understand child cancer research in plain language.
-              </h2>
+            <div className="flex min-h-[calc(100vh-88px)] flex-col justify-center py-12 sm:py-16">
+              <div className="scroll-fade">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Built for parents and caregivers</p>
+                <h2 className="mt-4 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-6xl">
+                  Learn what is changing in childhood cancer research.
+                </h2>
+                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">
+                  This guide helps families understand the progress happening across cancer fields, from new treatments to long-term side effects, without needing to read medical papers alone.
+                </p>
+              </div>
+
+              <div className="scroll-reveal mt-8 grid gap-3 sm:grid-cols-3">
+                {INTRO_POINTS.map((point) => (
+                  <div key={point} className="rounded-2xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                    {point}
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href="#research-search"
+                className="mt-10 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-950 dark:border-slate-800 dark:text-slate-300 dark:hover:text-white"
+              >
+                Start searching
+                <ArrowDown className="h-4 w-4" />
+              </a>
+            </div>
+
+            <div id="research-search" className="scroll-reveal scroll-mt-24 py-8 sm:py-12">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Search the research</p>
+              <h3 className="mt-3 max-w-3xl text-3xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-4xl">
+                Find simple explanations and progress signals.
+              </h3>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
                 Search a cancer name, treatment, side effect, or question. Results show simple takeaways, research progress, and links to PubMed.
               </p>
@@ -338,7 +373,7 @@ export default function App() {
               </div>
             </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="scroll-reveal flex flex-col gap-4">
                 <div className="flex flex-wrap gap-2">
                   {TOPICS.map((item) => (
                     <button
@@ -415,14 +450,18 @@ export default function App() {
                   ) : (
                     <>
                       {analyticsLoading ? (
-                        <div className="rounded-[2rem] border border-slate-200 bg-white p-5 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                        <div className="scroll-scale rounded-[2rem] border border-slate-200 bg-white p-5 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                           Calculating research progress statistics...
                         </div>
                       ) : (
-                        <ResearchAnalytics articles={articles} analytics={analytics} />
+                        <div className="scroll-scale">
+                          <ResearchAnalytics articles={articles} analytics={analytics} />
+                        </div>
                       )}
                       {articles.map((article) => (
-                        <ArticleCard key={article.uid} article={article} audience="parent" />
+                        <div key={article.uid} className="scroll-reveal">
+                          <ArticleCard article={article} audience="parent" />
+                        </div>
                       ))}
                     </>
                   )}
