@@ -302,20 +302,20 @@ export default function App() {
           <SavedArticles allArticles={articles || []} />
         ) : (
           <section className="min-w-0">
-            <div className="flex min-h-[calc(100vh-88px)] flex-col justify-center py-12 sm:py-16">
-              <div className="scroll-fade">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Built for parents and caregivers</p>
-                <h2 className="mt-4 max-w-4xl text-4xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-6xl">
+            <div className="hero-picture scroll-fade flex min-h-[calc(100vh-88px)] flex-col justify-center overflow-hidden rounded-[2rem] px-5 py-12 text-white sm:px-8 sm:py-16 lg:px-12">
+              <div className="hero-copy max-w-4xl">
+                <p className="text-sm font-medium text-white/75">Built for parents and caregivers</p>
+                <h2 className="mt-4 max-w-4xl text-4xl font-semibold tracking-normal text-white sm:text-6xl">
                   Learn what is changing in childhood cancer research.
                 </h2>
-                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">
+                <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
                   This guide helps families understand the progress happening across cancer fields, from new treatments to long-term side effects, without needing to read medical papers alone.
                 </p>
               </div>
 
               <div className="scroll-reveal mt-8 grid gap-3 sm:grid-cols-3">
                 {INTRO_POINTS.map((point) => (
-                  <div key={point} className="rounded-2xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                  <div key={point} className="rounded-2xl border border-white/15 bg-white/10 p-4 text-sm leading-6 text-white/80 backdrop-blur-md">
                     {point}
                   </div>
                 ))}
@@ -323,7 +323,7 @@ export default function App() {
 
               <a
                 href="#research-search"
-                className="mt-10 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-950 dark:border-slate-800 dark:text-slate-300 dark:hover:text-white"
+                className="mt-10 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
               >
                 Start searching
                 <ArrowDown className="h-4 w-4" />
