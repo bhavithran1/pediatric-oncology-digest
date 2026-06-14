@@ -1,13 +1,72 @@
 import { useState } from 'react';
-import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Loader, Bookmark } from 'lucide-react';
-import { formatAuthors, journalBadgeColor, fetchAbstract, generateSummary } from '../utils/api';
+import {
+  Bookmark,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  FlaskConical,
+  HelpCircle,
+  Loader,
+  MessageCircleQuestion,
+} from 'lucide-react';
+import { fetchAbstract, formatAuthors, generateSummary } from '../utils/api';
 
-function getSavedIds() { return JSON.parse(localStorage.getItem('digest_saved') || '[]'); }
+function getSavedIds() {
+  try {
+    return JSON.parse(localStorage.getItem('digest_saved') || '[]');
+  } catch {
+    return [];
+  }
+}
+
 function toggleSaved(pmid) {
   const saved = getSavedIds();
-  const next = saved.includes(pmid) ? saved.filter(id => id !== pmid) : [...saved, pmid];
+  const next = saved.includes(pmid) ? saved.filter((id) => id !== pmid) : [...saved, pmid];
   localStorage.setItem('digest_saved', JSON.stringify(next));
   return next.includes(pmid);
+}
+
+function cleanText(value) {
+  return value?.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() || '';
+}
+
+function detectResearchStage(text) {
+  const lower = text.toLowerCase();
+  if (/phase\s?iii|randomized|randomised|clinical trial/.test(lower)) return 'Human trial';
+  if (/phase\s?i|phase\s?ii|pilot|feasibility/.test(lower)) return 'Early trial';
+  if (/retrospective|cohort|registry|database/.test(lower)) return 'Patient records';
+  if (/mouse|murine|cell line|preclinical|xenograft/.test(lower)) return 'Lab research';
+  return 'Research paper';
+}
+
+function pickFamilyQuestion(title, abstract) {
+  const text = `${title} ${abstract}`.toLowerCase();
+  if (/toxicity|adverse|side effect|safety/.test(text)) return 'What side effects or safety concerns did the study notice?';
+  if (/surviv|relapse|recurr|response|remission/.test(text)) return 'Did children do better, stay well longer, or respond differently?';
+  if (/genom|mutation|molecular|precision|targeted/.test(text)) return 'Could tumor testing help guide treatment choices?';
+  if (/quality of life|late effect|survivor|neurocognitive/.test(text)) return 'How might this affect life during or after treatment?';
+  return 'What did researchers learn, and is it ready for care today?';
+}
+
+function ResearchFlow({ stage }) {
+  return (
+    <div className="mini-flow" aria-label="Animated research explanation">
+      <div className="mini-flow-node is-active">
+        <span />
+        <strong>Study idea</strong>
+      </div>
+      <div className="mini-flow-line"><i /></div>
+      <div className="mini-flow-node is-active">
+        <span />
+        <strong>{stage}</strong>
+      </div>
+      <div className="mini-flow-line"><i /></div>
+      <div className="mini-flow-node">
+        <span />
+        <strong>Care meaning</strong>
+      </div>
+    </div>
+  );
 }
 
 export default function ArticleCard({ article, audience }) {
@@ -18,12 +77,14 @@ export default function ArticleCard({ article, audience }) {
   const [abstract, setAbstract] = useState(null);
 
   const pmid = article.uid;
-  const title = article.title?.replace(/<[^>]+>/g, '') || 'Untitled';
+  const title = cleanText(article.title) || 'Untitled research paper';
   const authors = formatAuthors(article.authors);
-  const journal = article.fulljournalname || article.source;
+  const journal = article.fulljournalname || article.source || 'Medical journal';
   const pubDate = article.pubdate;
   const doi = article.elocationid?.replace('doi: ', '');
   const articleType = article.pubtype?.join(', ');
+  const stage = detectResearchStage(`${title} ${articleType || ''} ${abstract || ''}`);
+  const familyQuestion = pickFamilyQuestion(title, abstract || '');
 
   async function handleExpand() {
     setExpanded(!expanded);
@@ -32,9 +93,8 @@ export default function ArticleCard({ article, audience }) {
       try {
         const text = await fetchAbstract(pmid);
         setAbstract(text);
-        const s = generateSummary(text, audience, title);
-        setSummary(s);
-      } catch (e) {
+        setSummary(generateSummary(text, audience, title));
+      } catch {
         setAbstract('Abstract not available.');
       } finally {
         setLoading(false);
@@ -43,102 +103,130 @@ export default function ArticleCard({ article, audience }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-sm transition-shadow">
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-rose-50 dark:bg-rose-900/20 rounded-lg shrink-0">
-            <BookOpen className="w-4 h-4 text-rose-500" />
+    <article className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
+      <div className="p-5">
+        <div className="flex items-start gap-4">
+          <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-300 sm:flex">
+            <FlaskConical className="h-5 w-5" />
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${journalBadgeColor(journal)}`}>
-                {journal}
+          <div className="min-w-0 flex-1">
+            <div className="mb-3 flex flex-wrap gap-2">
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                {stage}
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+              <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 dark:bg-teal-950 dark:text-teal-300">
                 {pubDate}
               </span>
-              {articleType && articleType.includes('Randomized') && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  RCT
+              {articleType && (
+                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                  {articleType.split(',')[0]}
                 </span>
               )}
             </div>
 
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug mb-1">{title}</h3>
-            {authors && <p className="text-xs text-gray-400 mb-2">{authors}</p>}
+            <h3 className="text-lg font-semibold leading-snug text-slate-950 dark:text-white">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+              {journal}{authors ? ` · ${authors}` : ''}
+            </p>
 
-            <div className="flex items-center gap-3 mt-2">
-              <a
-                href={"https://pubmed.ncbi.nlm.nih.gov/" + pmid + "/"}
-                target="_blank" rel="noopener noreferrer"
-                className="text-xs text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1"
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <button
+                onClick={handleExpand}
+                className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
               >
-                PubMed <ExternalLink className="w-3 h-3" />
+                {expanded ? 'Close explanation' : 'Explain simply'}
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+              <button
+                onClick={() => setSaved(toggleSaved(pmid))}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition ${
+                  saved
+                    ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300'
+                    : 'border-slate-200 text-slate-500 hover:border-amber-300 hover:text-amber-700 dark:border-slate-800 dark:text-slate-400'
+                }`}
+                title={saved ? 'Remove from saved articles' : 'Save article'}
+              >
+                <Bookmark className="h-4 w-4" fill={saved ? 'currentColor' : 'none'} />
+                {saved ? 'Saved' : 'Save'}
+              </button>
+              <a
+                href={`https://pubmed.ncbi.nlm.nih.gov/${pmid}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+              >
+                PubMed <ExternalLink className="h-3.5 w-3.5" />
               </a>
               {doi && (
                 <a
-                  href={"https://doi.org/" + doi}
-                  target="_blank" rel="noopener noreferrer"
-                  className="text-xs text-gray-400 hover:text-rose-500 hover:underline flex items-center gap-1"
+                  href={`https://doi.org/${doi}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
                 >
-                  DOI <ExternalLink className="w-3 h-3" />
+                  DOI <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               )}
-              <button
-                onClick={() => setSaved(toggleSaved(pmid))}
-                className={"p-1 rounded transition-colors " + (saved ? 'text-amber-500' : 'text-gray-400 hover:text-amber-400')}
-                title={saved ? 'Remove bookmark' : 'Bookmark article'}
-              >
-                <Bookmark className="w-3.5 h-3.5" fill={saved ? 'currentColor' : 'none'} />
-              </button>
-              <button
-                onClick={handleExpand}
-                className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
-              >
-                {expanded ? 'Hide' : 'Show'} Summary
-                {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              </button>
             </div>
           </div>
         </div>
       </div>
 
       {expanded && (
-        <div className="border-t border-gray-100 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700/30">
+        <div className="border-t border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/60">
           {loading && (
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <Loader className="w-4 h-4 animate-spin" />
-              Loading abstract…
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+              <Loader className="h-4 w-4 animate-spin text-teal-600" />
+              Reading the abstract and turning it into plain language...
             </div>
           )}
 
-          {!loading && summary && (
-            <div className="mb-3">
-              <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-2">{summary.headline}</p>
-              <ul className="space-y-1.5">
-                {summary.points.map((pt, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-gray-700 dark:text-gray-300">
-                    <span className="shrink-0 w-4 h-4 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">
-                      {i + 1}
-                    </span>
-                    {pt}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-xs text-gray-400 italic mt-2">{summary.note}</p>
-            </div>
-          )}
+          {!loading && (
+            <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+                <ResearchFlow stage={stage} />
+                <div className="mt-5 rounded-2xl bg-teal-50 p-4 text-sm leading-6 text-teal-900 dark:bg-teal-950 dark:text-teal-100">
+                  <HelpCircle className="mb-2 h-4 w-4" />
+                  {familyQuestion}
+                </div>
+              </div>
 
-          {!loading && abstract && (
-            <details className="text-xs">
-              <summary className="cursor-pointer text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium mb-1">
-                Full abstract
-              </summary>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mt-2 whitespace-pre-line">{abstract}</p>
-            </details>
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+                {summary ? (
+                  <>
+                    <h4 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                      <MessageCircleQuestion className="h-4 w-4" />
+                      {summary.headline}
+                    </h4>
+                    <div className="mt-4 space-y-3">
+                      {summary.points.map((point, index) => (
+                        <div key={point} className="flex gap-3 rounded-2xl bg-slate-50 p-3 dark:bg-slate-950">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-950 text-xs font-semibold text-white dark:bg-white dark:text-slate-950">
+                            {index + 1}
+                          </span>
+                          <p className="text-sm leading-6 text-slate-700 dark:text-slate-300">{point}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-4 text-sm leading-6 text-slate-500 dark:text-slate-400">{summary.note}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-slate-500 dark:text-slate-400">A simple summary is not available for this abstract.</p>
+                )}
+
+                {abstract && abstract !== 'Abstract not available.' && (
+                  <details className="mt-4 text-sm">
+                    <summary className="cursor-pointer font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                      Read the original abstract
+                    </summary>
+                    <p className="mt-3 whitespace-pre-line leading-7 text-slate-600 dark:text-slate-300">{abstract}</p>
+                  </details>
+                )}
+              </div>
+            </div>
           )}
         </div>
       )}
-    </div>
+    </article>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bookmark, Download, Trash2, FileText, ChevronDown } from 'lucide-react';
+import { Bookmark, Download, Trash2, FileText } from 'lucide-react';
 
 function exportRIS(articles) {
   const entries = articles.map(a => {
