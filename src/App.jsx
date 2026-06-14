@@ -4,14 +4,11 @@ import {
   AlertTriangle,
   BarChart3,
   Bookmark,
-  CalendarDays,
-  HeartHandshake,
   Library,
   Loader,
   RefreshCw,
   Search,
   ShieldCheck,
-  Sparkles,
   Stethoscope,
   TrendingUp,
 } from 'lucide-react';
@@ -82,53 +79,52 @@ function ResearchAnalytics({ articles, analytics }) {
   const usingPubMedCounts = Boolean(analytics);
 
   return (
-    <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="flex items-center gap-2 text-sm font-semibold text-teal-700 dark:text-teal-300">
+    <section className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-sm font-semibold text-slate-950 dark:text-white">
             <BarChart3 className="h-4 w-4" />
-            Field progress snapshot
+            Research progress
           </p>
-          <h3 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white">What the research activity looks like</h3>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
             {usingPubMedCounts
-              ? 'Counts come from PubMed for this exact search. Study mix and journals summarize the papers shown below.'
-              : 'PubMed count data is temporarily unavailable, so this snapshot summarizes the papers shown below.'}
+              ? 'PubMed counts for this search, plus a quick summary of the papers below.'
+              : 'Showing a quick summary from the papers loaded below.'}
           </p>
         </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800 dark:bg-teal-950 dark:text-teal-200">
+        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 dark:border-slate-800 dark:text-slate-300">
           <TrendingUp className="h-4 w-4" />
-          {momentum} momentum
+          {momentum}
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        <div className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-950">
           <Library className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-          <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{(analytics?.allTime ?? articles.length).toLocaleString()}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">{usingPubMedCounts ? 'matching papers all time' : 'visible papers loaded'}</p>
+          <p className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">{(analytics?.allTime ?? articles.length).toLocaleString()}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{usingPubMedCounts ? 'all-time papers' : 'papers loaded'}</p>
         </div>
-        <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+        <div className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-950">
           <Activity className="h-4 w-4 text-rose-500" />
-          <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{(analytics?.recent ?? fallbackYearly.at(-1)?.count ?? 0).toLocaleString()}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">{usingPubMedCounts ? 'published in the past year' : 'visible papers this year'}</p>
+          <p className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">{(analytics?.recent ?? fallbackYearly.at(-1)?.count ?? 0).toLocaleString()}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{usingPubMedCounts ? 'past year' : 'this year loaded'}</p>
         </div>
-        <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+        <div className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-950">
           <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
-          <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{clinicalCount}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">visible papers that mention trials</p>
+          <p className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">{clinicalCount}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">trial-related</p>
         </div>
       </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div>
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Publication trend</p>
-          <div className="mt-3 flex h-36 items-end gap-2 rounded-2xl bg-slate-50 p-3 dark:bg-slate-950">
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Five-year trend</p>
+          <div className="mt-2 flex h-24 items-end gap-2 rounded-2xl bg-slate-50 p-3 dark:bg-slate-950">
             {yearly.map((item) => (
               <div key={item.year} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-                <div className="flex h-24 w-full items-end">
+                <div className="flex h-14 w-full items-end">
                   <div
-                    className="w-full rounded-t-xl bg-teal-600 transition-all dark:bg-teal-400"
+                    className="w-full rounded-t-lg bg-slate-900 transition-all dark:bg-slate-100"
                     style={{ height: `${Math.max((item.count / maxYearCount) * 100, item.count > 0 ? 8 : 0)}%` }}
                     title={`${item.count} papers in ${item.year}`}
                   />
@@ -139,12 +135,12 @@ function ResearchAnalytics({ articles, analytics }) {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+        <div className="grid gap-3">
           <div>
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Study mix shown</p>
-            <div className="mt-3 space-y-2">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Study mix</p>
+            <div className="mt-2 space-y-1.5">
               {stages.map((item) => (
-                <div key={item.label} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-sm dark:bg-slate-950">
+                <div key={item.label} className="flex items-center justify-between text-sm">
                   <span className="text-slate-600 dark:text-slate-300">{item.label}</span>
                   <span className="font-semibold text-slate-950 dark:text-white">{item.count}</span>
                 </div>
@@ -152,10 +148,10 @@ function ResearchAnalytics({ articles, analytics }) {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Most common journals shown</p>
-            <div className="mt-3 space-y-2">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Top journals</p>
+            <div className="mt-2 space-y-1.5">
               {journals.map((item) => (
-                <div key={item.label} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2 text-sm dark:bg-slate-950">
+                <div key={item.label} className="flex items-center justify-between gap-3 text-sm">
                   <span className="min-w-0 truncate text-slate-600 dark:text-slate-300">{item.label}</span>
                   <span className="shrink-0 font-semibold text-slate-950 dark:text-white">{item.count}</span>
                 </div>
@@ -163,66 +159,6 @@ function ResearchAnalytics({ articles, analytics }) {
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function ParentResearchMap() {
-  return (
-    <section className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-5">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 dark:text-teal-300">How to read a study</p>
-          <h2 className="mt-1 text-lg font-semibold text-slate-950 dark:text-white">Follow the research story</h2>
-        </div>
-        <Sparkles className="h-5 w-5 text-amber-500" />
-      </div>
-
-      <div className="research-motion mt-5" aria-hidden="true">
-        <div className="research-step research-step-one">
-          <span>1</span>
-          <strong>Question</strong>
-          <small>What were doctors trying to learn?</small>
-        </div>
-        <div className="research-path">
-          <i />
-        </div>
-        <div className="research-step research-step-two">
-          <span>2</span>
-          <strong>Test</strong>
-          <small>Who was studied, and what changed?</small>
-        </div>
-        <div className="research-path">
-          <i />
-        </div>
-        <div className="research-step research-step-three">
-          <span>3</span>
-          <strong>Meaning</strong>
-          <small>Could this matter for families now?</small>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ResearchPulse({ loading, count }) {
-  return (
-    <section className="grid gap-3 sm:grid-cols-3">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-        <CalendarDays className="h-4 w-4 text-teal-600 dark:text-teal-300" />
-        <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">{loading ? '...' : count}</p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">research papers found</p>
-      </div>
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-        <HeartHandshake className="h-4 w-4 text-rose-500" />
-        <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">Plain</p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">family-first explanations</p>
-      </div>
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-        <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
-        <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">PubMed</p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">source-linked research</p>
       </div>
     </section>
   );
@@ -314,11 +250,11 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9f8] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/85">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <div className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-white dark:bg-white dark:text-slate-950">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-950 text-white dark:bg-white dark:text-slate-950">
               <Stethoscope className="h-5 w-5" />
             </div>
             <div>
@@ -354,22 +290,22 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:py-10">
         {mainTab === 'saved' ? (
           <SavedArticles allArticles={articles || []} />
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <section className="min-w-0">
-              <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
-                <p className="text-sm font-medium text-teal-700 dark:text-teal-300">For parents and caregivers</p>
-                <h2 className="mt-3 max-w-3xl text-4xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-5xl">
-                  Understand what child cancer research is saying right now.
-                </h2>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
-                  Search a cancer name, treatment, side effect, or question. Each paper opens into simple takeaways, a visual research flow, and links back to the original PubMed source.
-                </p>
+          <section className="min-w-0">
+            <div className="py-8 sm:py-12">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">For parents and caregivers</p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-normal text-slate-950 dark:text-white sm:text-5xl">
+                Understand child cancer research in plain language.
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
+                Search a cancer name, treatment, side effect, or question. Results show simple takeaways, research progress, and links to PubMed.
+              </p>
 
-                <form onSubmit={runSearch} className="mt-7 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-800 dark:bg-slate-950 sm:flex-row">
+              <div className="mt-7 rounded-3xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
+                <form onSubmit={runSearch} className="flex flex-col gap-3 sm:flex-row">
                   <label className="flex min-w-0 flex-1 items-center gap-3 px-3">
                     <Search className="h-5 w-5 shrink-0 text-slate-400" />
                     <input
@@ -381,27 +317,28 @@ export default function App() {
                   </label>
                   <button
                     disabled={loading}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
                   >
                     {loading ? <Loader className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                    Search research
+                    Search
                   </button>
                 </form>
 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2 px-1">
                   {QUICK_SEARCHES.map((term) => (
                     <button
                       key={term}
                       onClick={() => applyQuickSearch(term)}
-                      className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600 transition hover:border-teal-300 hover:text-teal-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-teal-600"
+                      className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600 transition hover:border-slate-400 hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-white"
                     >
                       {term}
                     </button>
                   ))}
                 </div>
               </div>
+            </div>
 
-              <div className="mt-6 flex flex-col gap-4">
+              <div className="flex flex-col gap-4">
                 <div className="flex flex-wrap gap-2">
                   {TOPICS.map((item) => (
                     <button
@@ -410,7 +347,7 @@ export default function App() {
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                         topic === item.id
                           ? 'border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-slate-950'
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-teal-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300'
                       }`}
                     >
                       {item.label}
@@ -426,7 +363,7 @@ export default function App() {
                         onClick={() => handleDateChange(option.v)}
                         className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
                           dateRange === option.v
-                            ? 'bg-teal-700 text-white'
+                            ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950'
                             : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                         }`}
                       >
@@ -461,7 +398,7 @@ export default function App() {
 
               {!loading && articles !== null && (
                 <div className="mt-6 space-y-4">
-                  <div className="flex items-end justify-between gap-4">
+                  <div className="flex items-end justify-between gap-4 border-t border-slate-200 pt-5 dark:border-slate-800">
                     <div>
                       <p className="text-sm font-semibold text-slate-950 dark:text-white">
                         {articles.length} research papers
@@ -492,20 +429,6 @@ export default function App() {
                 </div>
               )}
             </section>
-
-            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-              <ResearchPulse loading={loading} count={articles?.length ?? 0} />
-              <ParentResearchMap />
-              <section className="rounded-[2rem] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-                <h2 className="text-lg font-semibold text-slate-950 dark:text-white">Questions to bring to clinic</h2>
-                <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  <p>Does this study include children like mine?</p>
-                  <p>Is this already standard care, a clinical trial, or early lab research?</p>
-                  <p>What benefits and side effects did researchers actually measure?</p>
-                </div>
-              </section>
-            </aside>
-          </div>
         )}
       </main>
     </div>
